@@ -1,0 +1,12 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+button {
+    float: right;
+    border: none;
+    height: 40px;
+    width: 80px;
+    background-color: green;
+}
