@@ -16,6 +16,11 @@
 
     <?php
     
+    $host = "localhost";
+    $user = "root";
+    $pw = "";
+    $db = "forum";
+
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errors = [];
 
@@ -51,6 +56,18 @@
 
         if (sizeof($errors) == 0) {
             echo "yaaay";
+            $con = new mysqli($host, $user, $pw, $db);
+
+            if ($con->connect_error) {
+                die();
+            }
+            $password_hashed = password_hash($password, PASSWORD_DEFAULT);
+            if (!$password_hashed) {
+                $sql = "INSERT INTO `users`(`username`, `email`, `pwd_hash`) VALUES ('$username','$email','$password_hashed')";
+                $res = $con->query($sql);
+            }
+
+            $con->close();
         } else {
             for ($error = 0; $error < sizeof($errors); $error++) { 
                 echo "<br>" . $errors[$error];

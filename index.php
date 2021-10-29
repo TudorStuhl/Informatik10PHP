@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="stylesheets/index.css">
 </head>
 <body>
-        <a href="login/login.php">
-            <button>Login</button>
+        <a href="register/register.php">
+            <button>Registrieren</button>
         </a>
 </body>
 </html>

@@ -6,7 +6,7 @@ $pw = "";
 
 $con = new mysqli($host, $user, $pw);
 
-if ($con->connect_error) {
+if ($con -> connect_error) {
     die();
 }
 
@@ -20,9 +20,9 @@ $all_sql = [
 
 for ($i = 0; $i < sizeof($all_sql); $i++) {
     $sql = $all_sql[$i];
-    $res = $con->query($sql);
+    $res = $con -> query($sql);
 }
-
-$con->close();
+echo "Done with creating database and table.";
+$con -> close();
 
 ?>
