@@ -55,16 +55,19 @@
         }
 
         if (sizeof($errors) == 0) {
-            echo "yaaay";
             $con = new mysqli($host, $user, $pw, $db);
 
             if ($con->connect_error) {
                 die();
+                echo "Ein Verbindungsfehler ist aufgetreten";
             }
             $password_hashed = password_hash($password, PASSWORD_DEFAULT);
-            if (!$password_hashed) {
-                $sql = "INSERT INTO `users`(`username`, `email`, `pwd_hash`) VALUES ('$username','$email','$password_hashed')";
+            if ($password_hashed) {
+                $sql = "INSERT INTO `users` (`username`, `email`, `pwd_hash`) VALUES ('$username', '$email', '$password_hashed')";
                 $res = $con->query($sql);
+                echo "Registrierung erfolgreich";
+            } else {
+                echo "Hash fehlgeschlagen";
             }
 
             $con->close();
