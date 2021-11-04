@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -6,13 +9,7 @@
     <title>Forum</title>
 </head>
 <body>
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-        <input name="username" placeholder="Benutzername"><br>
-        <input name="email" placeholder="E-Mail"><br>
-        <input type="password" name="password" placeholder="Passwort"><br>
-        <input type="password" name="password_check" placeholder="Passwort wiederholen"><br>
-        <input type="submit" value="Registrieren">
-    </form>
+
 
     <?php
     
@@ -21,6 +18,17 @@
     $pw = "";
     $db = "forum";
 
+    if($_SESSION["user_id"] != -1 && $_SESSION["username"] != "guest") {
+        echo 'Du bist bereits angemeldet. <br> Möchtest du zurück zur Startseite gehen? <br> <button><a href="index.php">Zurück zur Startseite</a></button>';
+    }
+    else {
+        echo '<form action=' . htmlspecialchars($_SERVER["PHP_SELF"]) . ' method="post">
+        <input name="username" placeholder="Benutzername"><br>
+        <input name="email" placeholder="E-Mail"><br>
+        <input type="password" name="password" placeholder="Passwort"><br>
+        <input type="password" name="password_check" placeholder="Passwort wiederholen"><br>
+        <input type="submit" value="Registrieren">
+        </form>';
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errors = [];
 
@@ -57,26 +65,26 @@
         if (sizeof($errors) == 0) {
             $con = new mysqli($host, $user, $pw, $db);
 
-            if ($con->connect_error) {
+            if ($con -> connect_error) {
                 die();
                 echo "Ein Verbindungsfehler ist aufgetreten";
             }
             $password_hashed = password_hash($password, PASSWORD_DEFAULT);
             if ($password_hashed) {
                 $sql = "INSERT INTO `users` (`username`, `email`, `pwd_hash`) VALUES ('$username', '$email', '$password_hashed')";
-                $res = $con->query($sql);
+                $res = $con -> query($sql);
                 echo "Registrierung erfolgreich";
             } else {
                 echo "Hash fehlgeschlagen";
             }
 
-            $con->close();
+            $con -> close();
         } else {
             for ($error = 0; $error < sizeof($errors); $error++) { 
                 echo "<br>" . $errors[$error];
             }
         }
-    }
+    }}
 
     ?>
 </body>

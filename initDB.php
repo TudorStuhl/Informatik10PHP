@@ -24,5 +24,3 @@ for ($i = 0; $i < sizeof($all_sql); $i++) {
 }
 echo "Done with creating database and table.";
 $con -> close();
-
-?>

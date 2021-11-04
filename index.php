@@ -1,3 +1,10 @@
+<?php
+session_start();
+$_SESSION["username"] = "guest";
+$_SESSION["user_id"] = -1;
+$_SESSION["email"] = Null;
+?>
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -6,9 +13,12 @@
     <title>Forum</title>
     <link rel="stylesheet" href="stylesheets/index.css">
 </head>
-<body>
-        <a href="register/register.php">
+    <body>
+        <a href="register.php">
             <button>Registrieren</button>
         </a>
-</body>
+        <a href="login.php">
+            <button>Login</button>
+        </a>
+    </body>
 </html>
