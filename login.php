@@ -5,7 +5,7 @@
     <title>Document</title>
 </head>
 <body>
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+    <form action="?login=1" method="post">
         <input type="email" placeholder="E-Mail"><br>
         <input type="password" name="password" placeholder="Passwort"><br>
         <input type="submit" value="Anmelden">
@@ -19,7 +19,7 @@
         $email = $_POST['email'];
         $passwort = $_POST['password'];
 
-        $statement = $pdo->prepare("SELECT * FROM users WHERE email = $email");
+        $statement = $pdo->prepare("SELECT * FROM users WHERE email = :email");
         $result = $statement->execute(array('email' => $email));
         $user = $statement->fetch();
 
