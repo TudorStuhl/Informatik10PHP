@@ -6,22 +6,29 @@
 </head>
 <body>
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-        <input name="email" placeholder="E-Mail"><br>
+        <input type="email" placeholder="E-Mail"><br>
         <input type="password" name="password" placeholder="Passwort"><br>
         <input type="submit" value="Anmelden">
     </form>
 
     <?php
+    session_start();
+    $pdo = new PDO('mysql:host=localhost;dbname=forum', 'root', '');
     
-    $host = "localhost";
-    $user = "root";
-    $pw = "";
-    $db = "forum";
+    if (isset($_GET['login'])) {
+        $email = $_POST['email'];
+        $passwort = $_POST['password'];
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $errors = [];
-        $email = htmlspecialchars(stripslashes(trim($_POST["email"])));
-        $password = htmlspecialchars(stripslashes(trim($_POST["password"])));
+        $statement = $pdo->prepare("SELECT * FROM users WHERE email = $email");
+        $result = $statement->execute(array('email' => $email));
+        $user = $statement->fetch();
+
+        if ($user !== false && password_verify($passwort, $user['passwort'])) {
+            $_SESSION['userid'] = $user['id'];
+            die("Login erfolgreich, weiter zum Forum: <br> <a href= test.php><button>Forum</button></a>");
+        } else {
+            die("Email oder Passwort sind falsch!");
+        }
     }
 
     ?>
