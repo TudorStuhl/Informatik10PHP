@@ -28,13 +28,14 @@ session_start();
         <input type="password" name="password" placeholder="Passwort"><br>
         <input type="password" name="password_check" placeholder="Passwort wiederholen"><br>
         <input type="submit" value="Registrieren">
-        </form>';
+        </form>
+        Du hast bereits einen Account? Hier geht es zum <a href="login.php">Login.</a>'
+        ;
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errors = [];
 
         $username = htmlspecialchars(stripslashes(trim($_POST["username"])));
-        $email = htmlspecialchars(stripslashes(trim($_POST["email"])));
-        $password = htmlspecialchars(stripslashes(trim($_POST["password"])));
+
         $password_check = htmlspecialchars(stripslashes(trim($_POST["password_check"])));
 
         if (empty($username)) {
@@ -73,7 +74,7 @@ session_start();
             if ($password_hashed) {
                 $sql = "INSERT INTO `users` (`username`, `email`, `pwd_hash`) VALUES ('$username', '$email', '$password_hashed')";
                 $res = $con -> query($sql);
-                die("Registrierung erfolgreich, weiter zum Login: <br> <a href=login.php><button>Login</button>");
+                die("<br>Registrierung erfolgreich, weiter zum Login: <br> <a href=login.php><button>Login</button>");
             } else {
                 echo "Hash fehlgeschlagen";
             }

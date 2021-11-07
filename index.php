@@ -1,8 +1,14 @@
 <?php
 session_start();
-$_SESSION["username"] = "guest";
-$_SESSION["user_id"] = -1;
-$_SESSION["email"] = Null;
+
+
+if (!isset($_SESSION["user_id"])) { //Required so we don't overwrite the session vars everytime the index gets loaded
+    $_SESSION["username"] = "guest";
+    $_SESSION["user_id"] = -1;
+    $_SESSION["email"] = Null;
+}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -14,6 +20,9 @@ $_SESSION["email"] = Null;
     <link rel="stylesheet" href="stylesheets/index.css">
 </head>
     <body>
+        <form method="POST">
+            <input type="submit" name="button" value="Abmelden (Für Debug)">
+        </form>
         <a href="register.php">
             <button>Registrieren</button>
         </a>
@@ -22,3 +31,11 @@ $_SESSION["email"] = Null;
         </a>
     </body>
 </html>
+<?php
+if (array_key_exists('button', $_POST)) {
+    session_unset();
+    $_SESSION["username"] = "guest";
+    $_SESSION["user_id"] = -1;
+    $_SESSION["email"] = Null;
+}
+?>
