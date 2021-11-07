@@ -25,7 +25,7 @@
         $user = $statement->fetch();
 
         if ($user !== false && password_verify($password, $user['pwd_hash'])) {
-            $_SESSION['userid'] = $user['ID'];
+            $_SESSION['user_id'] = $user['ID'];
             die("Login erfolgreich, weiter zum Forum: <br> <a href= test.php><button>Forum</button></a>");
         } else {
             die("Email oder Passwort sind falsch!");
