@@ -73,7 +73,7 @@ session_start();
             if ($password_hashed) {
                 $sql = "INSERT INTO `users` (`username`, `email`, `pwd_hash`) VALUES ('$username', '$email', '$password_hashed')";
                 $res = $con -> query($sql);
-                echo "Registrierung erfolgreich";
+                die("Registrierung erfolgreich, weiter zum Login: <br> <a href=login.php><button>Login</button>");
             } else {
                 echo "Hash fehlgeschlagen";
             }
