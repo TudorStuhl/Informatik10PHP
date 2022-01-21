@@ -41,7 +41,9 @@
 
 
     }
-    
     ?>
+    <br><br>
+    Du hast noch keinen Account? <a href="index.php">Hier kannst du einen erstellen.</a><br>
+    <a href="index.php">Zurück zur Startseite</a><br>
 </body>
 </html>

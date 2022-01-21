@@ -35,7 +35,8 @@ session_start();
         $errors = [];
 
         $username = htmlspecialchars(stripslashes(trim($_POST["username"])));
-
+        $email = htmlspecialchars(stripslashes(trim($_POST["email"])));
+        $password = htmlspecialchars(stripslashes(trim($_POST["password"])));        
         $password_check = htmlspecialchars(stripslashes(trim($_POST["password_check"])));
 
         if (empty($username)) {
