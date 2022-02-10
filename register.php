@@ -68,8 +68,7 @@ session_start();
             $con = new mysqli($host, $user, $pw, $db);
 
             if ($con -> connect_error) {
-                die();
-                echo "Ein Verbindungsfehler ist aufgetreten";
+                die("Ein Verbindungsfehler ist aufgetreten");
             }
             $password_hashed = password_hash($password, PASSWORD_DEFAULT);
             if ($password_hashed) {
