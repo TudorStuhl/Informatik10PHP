@@ -31,6 +31,9 @@ if (!isset($_SESSION["user_id"])) { //Required so we don't overwrite the session
         </a>
         <a href="account.php">
             <button>Account</button>
+        </a><br>
+        <a href="questions.php">
+            <button>Fragen</button>
         </a>
     </body>
 </html>
