@@ -17,7 +17,7 @@ if (!isset($_SESSION["user_id"])) { //Required so we don't overwrite the session
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forum</title>
-    <link rel="stylesheet" href="stylesheets/index.css">
+    <link rel="stylesheet" href="./stylesheets/template.css">
 </head>
     <body>
         <form method="POST">
