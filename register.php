@@ -13,10 +13,9 @@ session_start();
 
     <?php
     
-    $host = "localhost";
-    $user = "root";
-    $pw = "";
-    $db = "forum";
+    $file = file_get_contents('database_config.json');
+    $data = json_decode($file, True);
+    
 
     if($_SESSION["user_id"] != -1 && $_SESSION["username"] != "guest") {
         echo 'Du bist bereits angemeldet. <br> Möchtest du zurück zur Startseite gehen? <br> <button><a href="index.php">Zurück zur Startseite</a></button>';
@@ -65,7 +64,7 @@ session_start();
         }
 
         if (sizeof($errors) == 0) {
-            $con = new mysqli($host, $user, $pw, $db);
+            $con = new mysqli($data["host"], $data["user"], $data["password"], $data["database"]);
 
             if ($con -> connect_error) {
                 die("Ein Verbindungsfehler ist aufgetreten");

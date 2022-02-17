@@ -7,13 +7,9 @@
 </head>
 <body>
     <?php
-
-    $host = "localhost";
-    $user = "root";
-    $pw = "";
-    $db = "forum";
-
-    $con = new mysqli($host, $user, $pw, $db);
+    $file = file_get_contents('database_config.json');
+    $data = json_decode($file, True);
+    $con = new mysqli($data["host"], $data["user"], $data["password"], $data["database"]);
 
     if ($con -> connect_error) {
         die("Ein Verbindungsfehler ist aufgetreten");

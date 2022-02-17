@@ -14,8 +14,9 @@
     </form>
 
     <?php
-    
-    $pdo = new PDO('mysql:host=localhost;dbname=forum', 'root', '');
+    $file = file_get_contents('database_config.json');
+    $data = json_decode($file, True);
+    $pdo = new PDO("mysql:host=". $data["host"]. ";dbname=" . $data["database"], $data["user"] , $data["password"]);
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
         $email = htmlspecialchars(stripslashes(trim($_POST["email"])));
@@ -43,7 +44,7 @@
     }
     ?>
     <br><br>
-    Du hast noch keinen Account? <a href="index.php">Hier kannst du einen erstellen.</a><br>
+    Du hast noch keinen Account? <a href="register.php">Hier kannst du einen erstellen.</a><br>
     <a href="index.php">Zurück zur Startseite</a><br>
 </body>
 </html>
