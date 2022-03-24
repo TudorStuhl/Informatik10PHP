@@ -1,4 +1,4 @@
-<?php session_start();
+<?php session_start();  //start session
 ?>
 <html lang="de">
 <head>
@@ -8,7 +8,7 @@
     <title>Login</title>
 </head>
 <body>
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post"> <!-- form to get the login credentials of the user -->
         <input name="email" placeholder="E-Mail"><br>
         <input name="password" type="password" placeholder="Passwort"><br>
         <input type="submit" value="Anmelden">
@@ -17,17 +17,17 @@
     <?php
     $file = file_get_contents('database_config.json');
     $data = json_decode($file, True);
-    $pdo = new PDO("mysql:host=". $data["host"]. ";dbname=" . $data["database"], $data["user"] , $data["password"]);
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $pdo = new PDO("mysql:host=". $data["host"]. ";dbname=" . $data["database"], $data["user"] , $data["password"]);    //connecting to the database
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {     //checking if form has been submitted
     
-        $email = htmlspecialchars(stripslashes(trim($_POST["email"])));
-        $password = htmlspecialchars(stripslashes(trim($_POST["password"])));
+        $email = htmlspecialchars(stripslashes(trim($_POST["email"])));         //setting email from the form as variable
+        $password = htmlspecialchars(stripslashes(trim($_POST["password"])));   //setting password from the form as variable
         
-        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $statement = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {        //checking if email is valid
+            $statement = $pdo->prepare("SELECT * FROM users WHERE email = :email");     //getting user credentials from database
             $result = $statement->execute(array('email' => $email));
             $user = $statement->fetch();
-            if ($user !== false && password_verify($password, $user['pwd_hash'])) {
+            if ($user !== false && password_verify($password, $user['pwd_hash'])) {     //checking if the user login data matches the data in the database
                 $_SESSION['user_id'] = $user['ID'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['email'] = $user['email'];
@@ -37,7 +37,7 @@
             }
         }
         else {
-            echo "Eine gültige E-Mail ist erforderlich";
+            echo "Eine gültige E-Mail ist erforderlich";    //giving feedback if email isn't valid
         }
 
 
