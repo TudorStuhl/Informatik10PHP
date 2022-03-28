@@ -3,6 +3,6 @@
     "user":"root",
     "password":"",
     "database":"forum",
-    "tables":["users", "entires", "replies"]
+    "tables":["users", "entries", "replies"]
 
 }
