@@ -4,13 +4,14 @@
 <head>
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <link rel='stylesheet' href='./stylesheets/index2.css'>
+    <link rel='stylesheet' media="screen and (min-aspect-ratio: 16/9)" href='./stylesheets/index2.css'>
+    <link rel='stylesheet' media="screen and (max-aspect-ratio: 16/9)" href='./stylesheets/index3.css'>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <title>Forum - Fragen</title>
 </head>
 
 <body>
-<div id="navbar">
+    <div id="navbar">
         <span class="material-icons">home</span>
         <span class="material-icons">edit_note</span>
         <span class="material-icons">logout</span>
