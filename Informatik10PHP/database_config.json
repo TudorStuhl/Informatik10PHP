@@ -1,8 +1,0 @@
-{
-    "host":"localhost",
-    "user":"root",
-    "password":"",
-    "database":"forum",
-    "tables":["users", "entries", "replies"]
-
-}
