@@ -78,11 +78,19 @@ content {
     font-weight: 600;
 }
 
-#sidebar span a {
+#sidebar span span {
     color: #FDFBED;
     font-size: 30px;
     line-height: 50px;
-    text-decoration: none;
+    cursor: pointer;
+    transition: 300ms;
+}
+
+#sidebar span s {
+    color: #C9C9C9;
+    font-size: 30px;
+    line-height: 50px;
+    cursor: default;
     transition: 300ms;
 }
 
@@ -93,7 +101,7 @@ content {
     transition: 300ms;
 }
 
-#sidebar span a:hover, #logout-side:hover {
+#sidebar span span:hover, #logout-side:hover {
     color: #C9C9C9;
 }
 

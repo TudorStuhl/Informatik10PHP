@@ -3,9 +3,9 @@ session_start(); //starting session
 
 
 if (!isset($_SESSION["user_id"])) { //Required so we don't overwrite the session vars everytime the index gets loaded
-    $_SESSION["username"] = "guest";    //login user in as guest for default
-    $_SESSION["user_id"] = -1;
-    $_SESSION["email"] = Null;
+    $_SESSION['user_id'] = -1; //login user in as guest for default
+    $_SESSION['username'] = "Gast";
+    $_SESSION['email'] = "Du bist nicht angemeldet";
 }
 
 
@@ -40,7 +40,8 @@ if (!isset($_SESSION["user_id"])) { //Required so we don't overwrite the session
 <?php
 if (array_key_exists('button', $_POST)) {       
     session_unset();
-    $_SESSION["user_id"] = -1;
-    $_SESSION["email"] = Null;
+    $_SESSION['user_id'] = -1;
+    $_SESSION['username'] = "Gast";
+    $_SESSION['email'] = "Du bist nicht angemeldet";
 }
 ?>
