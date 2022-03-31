@@ -1,0 +1,12 @@
+/*
+In this file all CSS for the basic design (header, footer, background and so on) will be made.
+Customization for single pages will be done in specific files.
+*/
+
+html {
+    background-color: #3A3B3C;    
+}
+
+a {
+    color: red;
+}
