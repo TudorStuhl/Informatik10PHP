@@ -4,9 +4,6 @@
             case 'reload':
                 reload();
                 break;
-            case 'logout':
-                logout();
-                break;
             }
     }
 
@@ -34,13 +31,17 @@
                     $username = "deleted user";
                 }
                 $date = $i['date'];
+                $question_id = $i['ID'];
                 $topic = $i['topic'];
                 $content = $i['content'];
+                if (strlen($content) > 235) {
+                    $content = substr($content, 0, 234) . "…";
+                }
                 // Setting a random color for each question out of the three available
                 $color = $colors[array_rand($colors)];
                 $key = array_search($color, $colors);
                 unset($colors[$key]);
-                echo "
+                echo "<a href='question.php?id=$question_id'>
                 <div class='question $color'>
                 <div>
                     <span class='name' style='text-align: center;'>$username</span><br>
@@ -51,14 +52,11 @@
                     $content
                 </p>
             </div>
+            </a>
                 ";
             }
         }
         $con->close();
-        exit;
-    }
-
-    function logout() {
         exit;
     }
 ?>

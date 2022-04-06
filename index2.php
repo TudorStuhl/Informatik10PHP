@@ -20,12 +20,41 @@
 <body>
     <div id="blackscreen" onclick="quit_blackscreen()"></div>
     <div id="hoverbox-bg">
-        <div id="hoverbox">
-            <!--<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                <input name="question" maxlength="57" placeholder="Frage hier eingeben..."><br>
-                <textarea name="description" cols="30" rows="10"></textarea>
-            </form>-->
-        </div>
+        
+            <?php
+            if ($_SESSION['user_id'] != -1) {
+                echo "
+                <div id='hoverbox'>
+                    <form action='" . htmlspecialchars($_SERVER["PHP_SELF"]) . "' method='post'>
+                        <input id='question' name='question' maxlength='57' placeholder='Frage hier eingeben...'><br>
+                        <textarea id='description' name='description' cols='30' rows='10' placeholder='Beschreibung hier eingeben...'></textarea>
+                        <input type='submit'>
+                    </form>
+                </div>
+                ";
+            } else {
+                echo "
+                <div id='hoverbox' style='display: flex; justify-content: center; align-items: center;'>
+                    <h1 style='color: #404040; font-size: 52px; text-align: center;'>Du must angemeldet sein,<br>um Fragen verfassen zu können</h1>
+                </div>
+                ";
+            }
+        ?>
+        <?php
+            echo $_SESSION['user_id'];
+            $file = file_get_contents('database_config.json');
+            $data = json_decode($file, True);
+            $con = new mysqli($data["host"], $data["user"], $data["password"], $data["database"]);    //connecting to the database
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {     //checking if form has been submitted
+            
+                $question = htmlspecialchars(stripslashes(trim($_POST["question"])));         //setting question from the form as variable
+                $description = htmlspecialchars(stripslashes(trim($_POST["description"])));   //setting description from the form as variable
+                
+                //putting question into database
+                $sql = "INSERT INTO `entries` (`user_id`, `date`, `topic`, `content`) VALUES (" . $_SESSION['user_id'] . ", current_timestamp(), '$question', '$description')";
+                $res = $con -> query($sql);
+            }
+        ?>
     </div>
     <div id="navbar">
         <span class="material-icons">home</span>
@@ -85,13 +114,17 @@
                     $username = "deleted user";
                 }
                 $date = $i['date'];
+                $question_id = $i['ID'];
                 $topic = $i['topic'];
                 $content = $i['content'];
+                if (strlen($content) > 235) {
+                    $content = substr($content, 0, 234) . "…";
+                }
                 // Setting a random color for each question out of the three available
                 $color = $colors[array_rand($colors)];
                 $key = array_search($color, $colors);
                 unset($colors[$key]);
-                echo "
+                echo "<a href='question.php?id=$question_id'>
                 <div class='question $color'>
                 <div>
                     <span class='name' style='text-align: center;'>$username</span><br>
@@ -102,6 +135,7 @@
                     $content
                 </p>
             </div>
+            </a>
                 ";
             }
         }
@@ -122,16 +156,7 @@
             });
         });
         $('.logout').click(function(){
-            var ajaxurl = 'ajax.php',
-            data =  {'action': 'logout'};
-            $.post(ajaxurl, data, function (response) {
-                document.getElementsByTagName("questions")[0].innerHTML = document.getElementsByTagName("questions")[0].innerHTML +
-                '<?php session_unset();
-                $_SESSION['user_id'] = -1;
-                $_SESSION['username'] = "Gast";
-                $_SESSION['email'] = "Du bist nicht angemeldet";?>';
-                location.reload();
-            });
+            $(location).prop('href', './logout.php')
         });
     });
 </script>
@@ -224,6 +249,21 @@
         height: 100%;
 		opacity: 0;
     }
+
+    #question {
+        position: fixed;
+        outline: none;
+        border: none;
+        border-bottom: 2px solid #707070;
+        margin-top: 50px;
+        margin-left: 111px;
+        padding-bottom: 6px;
+        width: 1150px;
+        font-size: 36px;
+        color: #404040;
+        text-align: center;
+    }
+    
 </style>
 <script>
     function new_question() {
