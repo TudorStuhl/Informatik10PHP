@@ -54,7 +54,7 @@ session_start();
             $file = file_get_contents('database_config.json');
             $data = json_decode($file, True);
             $con = new mysqli($data["host"], $data["user"], $data["password"], $data["database"]);
-            $question_id = $_GET["id"];
+            $question_id = htmlspecialchars(stripslashes(trim($_GET["id"])));
             $res = $con -> query("SELECT * FROM entries WHERE ID = $question_id");
             $i = $res -> fetch_assoc();
             $topic = $i["topic"];
