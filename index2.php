@@ -48,7 +48,7 @@
             
                 $question = htmlspecialchars(stripslashes(trim($_POST["question"])));         //setting question from the form as variable
                 $description = htmlspecialchars(stripslashes(trim($_POST["description"])));   //setting description from the form as variable
-                
+
                 if ($question != "" && $description != "") {
                     //putting question into database
                     $sql = "INSERT INTO `entries` (`user_id`, `date`, `topic`, `content`) VALUES (" . $_SESSION['user_id'] . ", current_timestamp(), '$question', '$description')";
@@ -87,7 +87,7 @@
                         $_SESSION['user_id'] = $user['ID'];
                         $_SESSION['username'] = $user['username'];
                         $_SESSION['email'] = $user['email'];
-                        echo "<script>document.getElementById('login-check').innerHTML='logged_in';</script>";
+                        echo "<script>window.location.replace('')</script>";
                     } else {
                         echo "<script>setTimeout(function() { alert('Email oder Passwort ist falsch!'); }, 100);</script>";
                     }
@@ -98,9 +98,121 @@
             }
         ?>
     </div>
+    <div id="blackscreen-register" onclick="quit_blackscreen_register()"></div>
+    <div id="hoverbox-bg-register">
+        <div id='hoverbox-register'>
+            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                <br><br>
+                <h1 style="color: #404040; font-size: 52px; text-align: center;">Registrieren</h1>
+                <input id="register-username" name="register-username" placeholder="Benutzername"><br>
+                <input id="register-email" name="register-email" placeholder="E-Mail"><br>
+                <input id="register-password" name="register-password" type="password" placeholder="Passwort"><br>
+                <input id="register-password-check" name="register-password-check" type="password" placeholder="Passwort wiederholen"><br>
+                <input id="register-submit" type="submit" value="Weiter">
+            </form>
+        </div>
+        <?php
+            $file = file_get_contents('database_config.json');
+            $data = json_decode($file, True);
+            $pdo = new PDO("mysql:host=". $data["host"]. ";dbname=" . $data["database"], $data["user"] , $data["password"]);    //connecting to the database
+            if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["register-email"])) {     //checking if form has been submitted
+                $errors = [];
+
+                $username = htmlspecialchars(stripslashes(trim($_POST["register-username"])));
+                $email = htmlspecialchars(stripslashes(trim($_POST["register-email"])));
+                $password = htmlspecialchars(stripslashes(trim($_POST["register-password"])));
+                $password_check = htmlspecialchars(stripslashes(trim($_POST["register-password-check"])));
+
+                if (empty($username)) {
+                    $errors[] = "Ein Benutzername ist erforderlich";
+                }
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $errors[] = "Eine gültige E-Mail ist erforderlich" . filter_var($email, FILTER_VALIDATE_EMAIL);
+                }
+                if (empty($password)) {
+                    $errors[] = "Ein Passwort ist erforderlich";
+                }
+                if (strlen($username) > 255) {
+                    $errors[] = "Der Benutzername ist zu lang";
+                }
+                if (strlen($email) > 255) {
+                    $errors[] = "Die Mailadresse ist zu lang";
+                }
+                if (strlen($password) > 255) {
+                    $errors[] = "Das Passwort ist zu lang";
+                }
+                if (strlen($password) < 8) {
+                    $errors[] = "Das Passwort muss mindestens acht Zeichen lang sein";
+                }
+                if ($password != $password_check) {
+                    $errors[] = "Die beiden Passwörter stimen nicht überein";
+                }
+
+                if (sizeof($errors) == 0) {
+                    $con = new mysqli($data["host"], $data["user"], $data["password"], $data["database"]);
+
+                    if ($con -> connect_error) {
+                        die("Ein Verbindungsfehler ist aufgetreten");
+                    }
+                    $password_hashed = password_hash($password, PASSWORD_DEFAULT);
+                    if ($password_hashed) {
+                        $sql = "INSERT INTO `users` (`username`, `email`, `pwd_hash`) VALUES ('$username', '$email', '$password_hashed')";
+                        $res = $con -> query($sql);
+                    } else {
+                        echo "<script>setTimeout(function() { alert('Hash fehlgeschlagen!'); }, 100);</script>";
+                    }
+
+                    $con -> close();
+                } else {
+                    for ($error = 0; $error < sizeof($errors); $error++) { 
+                        echo "<script>setTimeout(function() { alert('$errors[$error]!'); }, 100);</script>";
+                    }
+                }
+            }
+        ?>
+    </div>
+    <div id="blackscreen-edit-account" onclick="quit_blackscreen_edit_account()"></div>
+    <div id="hoverbox-bg-edit-account">
+        <div id='hoverbox-edit-account'>
+            <form id="edit-account-form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                <input id="edit-account" name="edit-username" placeholder="Neuer Name">
+            </form>
+        </div>
+        <?php
+            $file = file_get_contents('database_config.json');
+            $data = json_decode($file, True);
+            $con = new mysqli($data["host"], $data["user"], $data["password"], $data["database"]); //connecting to database
+            if ($con -> connect_error) { die("Ein Fehler ist aufgetreten"); }   //checking if connection was succesful
+            if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["edit-username"])) {
+                if (strlen($_POST["edit-username"]) == 0 || strlen($_POST["edit-username"]) > 255) {
+                    echo "<script>setTimeout(function() { alert('Der Nutzername muss zwischen 1 und 255 Zeichen lang sein!'); }, 100);</script>";
+                } else {
+                    $res = $con -> query("UPDATE users SET username = '" . $_POST["edit-username"] . "' WHERE ID = " . $_SESSION["user_id"] . ";");
+                    $res = $con -> query("SELECT * FROM users WHERE ID = " . $_SESSION["user_id"] . ";");
+                    $user_data = $res -> fetch_assoc();
+                    $_SESSION["username"] = $user_data["username"];     //refreshing username in session
+                }
+            } else if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["edit-email"])) {
+                if (strlen($_POST["edit-email"]) == 0 || strlen($_POST["edit-email"]) > 255 || !filter_var($_POST["edit-email"], FILTER_VALIDATE_EMAIL)) {
+                    echo "<script>setTimeout(function() { alert('Die Email muss zwischen 1 und 255 Zeichen lang sein und eine gültige Mailadresse sein!'); }, 100);</script>";
+                } else {
+                    $res = $con -> query("UPDATE users SET email = '" . $_POST["edit-email"] . "' WHERE ID = " . $_SESSION["user_id"] . ";");
+                    $res = $con -> query("SELECT * FROM users WHERE ID = " . $_SESSION["user_id"] . ";");
+                    $user_data = $res -> fetch_assoc();
+                    $_SESSION["email"] = $user_data["email"];   //refreshing email in session
+                }
+            } else if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["edit-password"])) {
+                if (strlen($_POST["edit-password"]) < 8 || strlen($_POST["edit-password"]) > 255) {
+                    echo "<script>setTimeout(function() { alert('Die Passwort muss zwischen 8 und 255 Zeichen lang sein!'); }, 100);</script>";
+                } else {
+                    $res = $con -> query("UPDATE users SET pwd_hash = '" . password_hash($_POST["edit-password"], PASSWORD_DEFAULT) . "' WHERE ID = " . $_SESSION["user_id"] . ";");
+                }
+            }
+        ?>
+    </div>
     <div id="navbar">
-        <span class="material-icons">home</span>
-        <span class="material-icons" onclick="new_question()">edit_note</span>
+        <span class="material-icons" onclick="window.location.replace('./')">home</span>
+        <span class="material-icons" onclick="new_question()"><?php if ($_SESSION['user_id'] != -1) { echo "edit_note"; } else { echo "person_add"; } ?></span>
         <span class="material-icons logout"><?php if ($_SESSION['user_id'] != -1) { echo "logout"; } else { echo "login"; } ?></span>
     </div>
     <div id="sidebar">
@@ -118,9 +230,9 @@
                 ";
             } else {
                 echo "
-                <span>Nutzernamen ändern</span><br>
-                <span>Email ändern</span><br>
-                <span>Passwort ändern</span>
+                <span onclick='edit_username()'>Nutzernamen ändern</span><br>
+                <span onclick='edit_email()'>Email ändern</span><br>
+                <span onclick='edit_password()'>Passwort ändern</span>
                 ";
             }
             ?>
@@ -216,6 +328,11 @@
 	@keyframes opacity-animation-2 {
         from {opacity: 1;}
         to {opacity: 0;}
+    }
+
+    .question p {
+        overflow: hidden;
+        word-break: break-word;
     }
     
     /* Hoverbox ask new question */
@@ -380,7 +497,172 @@
 		opacity: 0;
     }
 
-    /* Inside the hoverbox */
+    /* Hoverbox register */
+
+    #blackscreen-register {
+        display: none;
+    }
+
+
+    #blackscreen-anim-1-register {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: opacity-animation-1 0.5s ease;
+		position: fixed;
+		z-index: 98;
+        background-color: rgba(0, 0, 0, 0.26);
+        width: 100%;
+        height: 100%;
+    }
+
+	#blackscreen-anim-2-register {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: opacity-animation-2 0.5s ease;
+		position: fixed;
+		z-index: 98;
+        background-color: rgba(0, 0, 0, 0.26);
+        width: 100%;
+        height: 100%;
+		opacity: 0;
+    }
+
+    #hoverbox-register {
+        width: 850px;
+        height: 525px;
+        border-radius: 50px;
+        background-color: #FBFBFB;
+        box-shadow: 0px 4px 24px rgba(97, 97, 97, 0.16);
+        pointer-events: auto;
+    }
+
+    #hoverbox-bg-register {
+        display: none;
+		position: fixed;
+		z-index: 99;
+        background-color: transparent;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+    }
+
+    #hoverbox-bg-register {
+        display: none;
+    }
+
+    #hoverbox-bg-anim-1-register {
+        pointer-events: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: opacity-animation-1 0.5s ease;
+		position: fixed;
+		z-index: 99;
+        background-color: transparent;
+        width: 100%;
+        height: 100%;
+    }
+
+	#hoverbox-bg-anim-2-register {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: opacity-animation-2 0.5s ease;
+		position: fixed;
+		z-index: 99;
+        background-color: transparent;
+        width: 100%;
+        height: 100%;
+		opacity: 0;
+    }
+
+    /* Hoverbox edit account */
+
+    #blackscreen-edit-account {
+        display: none;
+    }
+
+
+    #blackscreen-anim-1-edit-account {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: opacity-animation-1 0.5s ease;
+		position: fixed;
+		z-index: 98;
+        background-color: rgba(0, 0, 0, 0.26);
+        width: 100%;
+        height: 100%;
+    }
+
+	#blackscreen-anim-2-edit-account {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: opacity-animation-2 0.5s ease;
+		position: fixed;
+		z-index: 98;
+        background-color: rgba(0, 0, 0, 0.26);
+        width: 100%;
+        height: 100%;
+		opacity: 0;
+    }
+
+    #hoverbox-edit-account {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 529px;
+        height: 103px;
+        border-radius: 50px;
+        background-color: #FBFBFB;
+        box-shadow: 0px 4px 24px rgba(97, 97, 97, 0.16);
+        pointer-events: auto;
+    }
+
+    #hoverbox-bg-edit-account {
+        display: none;
+		position: fixed;
+		z-index: 99;
+        background-color: transparent;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+    }
+
+    #hoverbox-bg-edit-account {
+        display: none;
+    }
+
+    #hoverbox-bg-anim-1-edit-account {
+        pointer-events: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: opacity-animation-1 0.5s ease;
+		position: fixed;
+		z-index: 99;
+        background-color: transparent;
+        width: 100%;
+        height: 100%;
+    }
+
+	#hoverbox-bg-anim-2-edit-account {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: opacity-animation-2 0.5s ease;
+		position: fixed;
+		z-index: 99;
+        background-color: transparent;
+        width: 100%;
+        height: 100%;
+		opacity: 0;
+    }
+
+    /* Inside the hoverboxes */
 
     #question {
         position: fixed;
@@ -481,11 +763,138 @@
         color: #FBFBFB;
         background-color: #707070;
     }
+
+    #register-username {
+        position: fixed;
+        outline: none;
+        border: none;
+        border: 2px solid #707070;
+        border-radius: 30px;
+        margin-left: 196px;
+        width: 458px;
+        padding: 6px;
+        padding-left: 27px;
+        padding-right: 27px;
+        text-align: center;
+        font-size: 30px;
+        color: #404040;
+    }
+
+    #register-email {
+        position: fixed;
+        outline: none;
+        border: none;
+        border: 2px solid #707070;
+        border-radius: 30px;
+        margin-top: 45px;
+        margin-left: 196px;
+        width: 458px;
+        padding: 6px;
+        padding-left: 27px;
+        padding-right: 27px;
+        text-align: center;
+        font-size: 30px;
+        color: #404040;
+    }
+
+    #register-password {
+        position: fixed;
+        outline: none;
+        border: none;
+        border: 2px solid #707070;
+        border-radius: 30px;
+        margin-top: 90px;
+        margin-left: 196px;
+        width: 458px;
+        padding: 6px;
+        padding-left: 27px;
+        padding-right: 27px;
+        text-align: center;
+        font-size: 30px;
+        color: #404040;
+    }
+
+    #register-password-check {
+        position: fixed;
+        outline: none;
+        border: none;
+        border: 2px solid #707070;
+        border-radius: 30px;
+        margin-top: 135px;
+        margin-left: 196px;
+        width: 458px;
+        padding: 6px;
+        padding-left: 27px;
+        padding-right: 27px;
+        text-align: center;
+        font-size: 30px;
+        color: #404040;
+    }
+
+    #register-submit {
+        position: fixed;
+        outline: none;
+        border: none;
+        border: 2px solid #707070;
+        border-radius: 30px;
+        margin-top: 195px;
+        margin-left: 287px;
+        width: 282px;
+        padding: 6px;
+        padding-left: 27px;
+        padding-right: 27px;
+        text-align: center;
+        font-size: 30px;
+        color: #404040;
+        background-color: transparent;
+        cursor: pointer;
+        transition: 300ms;
+    }
+
+    #register-submit:hover {
+        color: #FBFBFB;
+        background-color: #707070;
+    }
+
+    #edit-account {
+        outline: none;
+        border: none;
+        border: 2px solid #707070;
+        border-radius: 30px;
+        width: 458px;
+        padding: 6px;
+        padding-left: 27px;
+        padding-right: 27px;
+        text-align: center;
+        font-size: 30px;
+        color: #404040;
+    }
 </style>
 <script>
     function new_question() {
-        document.getElementById('blackscreen-question').id='blackscreen-anim-1-question';
-        document.getElementById('hoverbox-bg-question').id='hoverbox-bg-anim-1-question';
+        if (document.getElementById('login-check').innerHTML == "logged_in") {
+            document.getElementById('blackscreen-question').id='blackscreen-anim-1-question';
+            document.getElementById('hoverbox-bg-question').id='hoverbox-bg-anim-1-question';
+        }
+        else {
+            document.getElementById('blackscreen-register').id='blackscreen-anim-1-register';
+            document.getElementById('hoverbox-bg-register').id='hoverbox-bg-anim-1-register';
+        }
+    }
+    function edit_username() {
+        document.getElementById('edit-account-form').innerHTML = '<input id="edit-account" name="edit-username" placeholder="Neuer Name">';
+        document.getElementById('blackscreen-edit-account').id='blackscreen-anim-1-edit-account';
+        document.getElementById('hoverbox-bg-edit-account').id='hoverbox-bg-anim-1-edit-account';
+    }
+    function edit_email() {
+        document.getElementById('edit-account-form').innerHTML = '<input id="edit-account" name="edit-email" placeholder="Neue Email">';
+        document.getElementById('blackscreen-edit-account').id='blackscreen-anim-1-edit-account';
+        document.getElementById('hoverbox-bg-edit-account').id='hoverbox-bg-anim-1-edit-account';
+    }
+    function edit_password() {
+        document.getElementById('edit-account-form').innerHTML = '<input id="edit-account" name="edit-password" type="password" placeholder="Neues Passwort">';
+        document.getElementById('blackscreen-edit-account').id='blackscreen-anim-1-edit-account';
+        document.getElementById('hoverbox-bg-edit-account').id='hoverbox-bg-anim-1-edit-account';
     }
     function quit_blackscreen_question() {
         document.getElementById('blackscreen-anim-1-question').id='blackscreen-anim-2-question';
@@ -496,5 +905,15 @@
         document.getElementById('blackscreen-anim-1-login').id='blackscreen-anim-2-login';
         document.getElementById('hoverbox-bg-anim-1-login').id='hoverbox-bg-anim-2-login';
         setTimeout(() => { document.getElementById('blackscreen-anim-2-login').id='blackscreen-login'; document.getElementById('hoverbox-bg-anim-2-login').id='hoverbox-bg-login'; }, 500);
+    }
+    function quit_blackscreen_register() {
+        document.getElementById('blackscreen-anim-1-register').id='blackscreen-anim-2-register';
+        document.getElementById('hoverbox-bg-anim-1-register').id='hoverbox-bg-anim-2-register';
+        setTimeout(() => { document.getElementById('blackscreen-anim-2-register').id='blackscreen-register'; document.getElementById('hoverbox-bg-anim-2-register').id='hoverbox-bg-register'; }, 500);
+    }
+    function quit_blackscreen_edit_account() {
+        document.getElementById('blackscreen-anim-1-edit-account').id='blackscreen-anim-2-edit-account';
+        document.getElementById('hoverbox-bg-anim-1-edit-account').id='hoverbox-bg-anim-2-edit-account';
+        setTimeout(() => { document.getElementById('blackscreen-anim-2-edit-account').id='blackscreen-edit-account'; document.getElementById('hoverbox-bg-anim-2-edit-account').id='hoverbox-bg-edit-account'; }, 500);
     }
 </script>
