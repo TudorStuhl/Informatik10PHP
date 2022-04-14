@@ -1,5 +1,10 @@
-<?php 
-session_start();
+<?php
+    session_start(); //start session
+    if (!isset($_SESSION['user_id'])) {
+        $_SESSION['user_id'] = -1;
+        $_SESSION['username'] = "Gast";
+        $_SESSION['email'] = "Du bist nicht angemeldet";
+    }
 ?>
 <html lang="de">
 <head>
@@ -13,9 +18,9 @@ session_start();
 <body>
     
     <div id="navbar">
-        <span class="material-icons">home</span>
+        <span class="material-icons" onclick="window.location.href= './index.php'">home</span>
         <span class="material-icons" onclick="new_question()">edit_note</span>
-        <span class="material-icons logout">logout</span>
+    <span class="material-icons logout" onclick="logout()">logout</span>
     </div>
     <div id="sidebar">
     <img id="avatar" src="./img/avatar.svg" alt="avatar">
@@ -40,7 +45,7 @@ session_start();
             ?>
         </span>
         <br><br><br><br><br>
-        <span id="logout-side" class="material-icons logout">logout</span>
+        <span id="logout-side" class="material-icons logout" onclick="logout()">logout</span>
     </div>
     </div>
     <content>
@@ -55,6 +60,7 @@ session_start();
             $data = json_decode($file, True);
             $con = new mysqli($data["host"], $data["user"], $data["password"], $data["database"]);
             $question_id = htmlspecialchars(stripslashes(trim($_GET["id"])));
+            $_POST["question_id"] = $question_id;
             $res = $con -> query("SELECT * FROM entries WHERE ID = $question_id");
             $i = $res -> fetch_assoc();
             $topic = $i["topic"];
@@ -98,8 +104,8 @@ session_start();
                     $content = $i["content"];
 
                     //Query and fetch the user
-                    $res = $con -> query("SELECT username FROM users WHERE ID = $user_id");
-                    $b = $res -> fetch_array();
+                    $ras = $con -> query("SELECT username FROM users WHERE ID = $user_id");
+                    $b = $ras -> fetch_array();
                     $username = $b[0];
                     
                     //Display the answer with the content
@@ -112,18 +118,30 @@ session_start();
                         </div>
                         <p>
                             $content
+                        
                         </p>
                     </div>
                     
                     
                     ";
                 }
+            
         }
         else {
             //If there are no replies in the database, give the user a feedback
             echo "<p class='anti-answer'>Es gibt noch keine Antworten auf diese Frage.</p>";
         }
+        
     }
+
+    echo "<script>
+            function logout() {
+            window.location.href = 'question_logout.php?id=" . "$question_id';
+            }
+
+            
+            </script>";
+
     ?>
     <content>
 </body>

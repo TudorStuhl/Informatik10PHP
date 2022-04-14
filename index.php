@@ -258,6 +258,10 @@
         $colors = ["g", "b", "r"];
         if ($res->num_rows > 0) {
             while ($i = $res->fetch_assoc()) {
+                $question_id = $i["ID"];
+                $conn = new mysqli($data['host'], $data['user'], $data['password'], $data['database']);
+                $ras = $conn -> query("SELECT * FROM replies WHERE entry_id = $question_id");
+                $answers = $ras -> num_rows;
                 $user_id = $i["user_id"];
                 $username = "USERNAME_MISSING";
                 $result = $con->query("SELECT * FROM users WHERE ID = $user_id;");
@@ -282,7 +286,7 @@
                 <div class='question $color'>
                 <div>
                     <span class='name' style='text-align: center;'>$username</span><br>
-                    <span class='answers'>10<br>Antworten</span>
+                    <span class='answers'>$answers<br>Antworten</span>
                 </div>
                 <h2>$topic</h2>
                 <p>

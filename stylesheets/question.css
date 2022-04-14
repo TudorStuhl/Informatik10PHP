@@ -184,6 +184,7 @@ content {
     padding: 18px;
     color: #404040;
     font-size: 30px;
+    word-break: break-word;
 }
 
 .anti-answer {
