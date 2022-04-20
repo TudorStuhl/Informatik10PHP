@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <?php
-    session_start(); //start session
+    session_start(); 
+    // Setting user as guest if not logged-in
     if (!isset($_SESSION['user_id'])) {
         $_SESSION['user_id'] = -1;
         $_SESSION['username'] = "Gast";
         $_SESSION['email'] = "Du bist nicht angemeldet";
     }
+
 ?>
 <html lang="de">
 <head>
@@ -22,6 +24,7 @@
     <div id="blackscreen-question" onclick="quit_blackscreen_question()"></div>
     <div id="hoverbox-bg-question">
             <?php
+            // Form to compose a question
             if ($_SESSION['user_id'] != -1) {
                 echo "
                 <div id='hoverbox-question'>
@@ -43,16 +46,20 @@
         <?php
             $file = file_get_contents('database_config.json');
             $data = json_decode($file, True);
-            $con = new mysqli($data["host"], $data["user"], $data["password"], $data["database"]);    //connecting to the database
-            if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["question"])) {     //checking if form has been submitted
-            
-                $question = htmlspecialchars(stripslashes(trim($_POST["question"])));         //setting question from the form as variable
-                $description = htmlspecialchars(stripslashes(trim($_POST["description"])));   //setting description from the form as variable
-
+            //connecting to the database
+            $con = new mysqli($data["host"], $data["user"], $data["password"], $data["database"]);    
+            //checking if form has been submitted
+            if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["question"])) {  
+                // Setting question and description as variable   
+                $question = htmlspecialchars(stripslashes(trim($_POST["question"])));         
+                $description = htmlspecialchars(stripslashes(trim($_POST["description"])));   
+                //putting question into database
                 if ($question != "" && $description != "") {
-                    //putting question into database
+                    
                     $sql = "INSERT INTO `entries` (`user_id`, `date`, `topic`, `content`) VALUES (" . $_SESSION['user_id'] . ", current_timestamp(), '$question', '$description')";
                     $res = $con -> query($sql);
+                    $_POST["question"] = "";
+                    $_POST["description"] = "";
                 } else {
                     echo "<script>setTimeout(function() { alert('Achtung: Die Felder für die Frage und die Beschreibung dürfen nicht leer sein!'); }, 100);</script>";
                 }
@@ -62,6 +69,7 @@
     <div id="blackscreen-login" onclick="quit_blackscreen_login()"></div>
     <div id="hoverbox-bg-login">
         <div id='hoverbox-login'>
+            <!-- Form for login -->
             <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                 <br><br>
                 <h1 style="color: #404040; font-size: 52px; text-align: center;">Login</h1>
@@ -73,17 +81,19 @@
         <?php
             $file = file_get_contents('database_config.json');
             $data = json_decode($file, True);
-            $pdo = new PDO("mysql:host=". $data["host"]. ";dbname=" . $data["database"], $data["user"] , $data["password"]);    //connecting to the database
-            if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["login-email"])) {     //checking if form has been submitted
-            
-                $email = htmlspecialchars(stripslashes(trim($_POST["login-email"])));         //setting login-email from the form as variable
-                $password = htmlspecialchars(stripslashes(trim($_POST["login-password"])));   //setting login-password from the form as variable
-                
-                if (filter_var($email, FILTER_VALIDATE_EMAIL)) {        //checking if email is valid
-                    $statement = $pdo->prepare("SELECT * FROM users WHERE email = :email");     //getting user credentials from database
+            //connecting to the database
+            $pdo = new PDO("mysql:host=". $data["host"]. ";dbname=" . $data["database"], $data["user"] , $data["password"]);    
+            //checking if form has been submitted
+            if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["login-email"])) {     
+            //setting login-email and login-password from the login-form as variables
+                $email = htmlspecialchars(stripslashes(trim($_POST["login-email"])));         
+                $password = htmlspecialchars(stripslashes(trim($_POST["login-password"])));   
+                // Compare form input with user credentials from database
+                if (filter_var($email, FILTER_VALIDATE_EMAIL)) {        
+                    $statement = $pdo->prepare("SELECT * FROM users WHERE email = :email");     
                     $result = $statement->execute(array('email' => $email));
                     $user = $statement->fetch();
-                    if ($user !== false && password_verify($password, $user['pwd_hash'])) {     //checking if the user login data matches the data in the database
+                    if ($user !== false && password_verify($password, $user['pwd_hash'])) {    
                         $_SESSION['user_id'] = $user['ID'];
                         $_SESSION['username'] = $user['username'];
                         $_SESSION['email'] = $user['email'];
@@ -93,7 +103,7 @@
                     }
                 }
                 else {
-                    echo "<script>setTimeout(function() { alert('Eine gültige Email ist erforderlich!'); }, 100);</script>";    //giving feedback if email isn't valid
+                    echo "<script>setTimeout(function() { alert('Eine gültige Email ist erforderlich!'); }, 100);</script>";    
                 }
             }
         ?>
@@ -101,6 +111,7 @@
     <div id="blackscreen-register" onclick="quit_blackscreen_register()"></div>
     <div id="hoverbox-bg-register">
         <div id='hoverbox-register'>
+            <!-- registerform -->
             <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                 <br><br>
                 <h1 style="color: #404040; font-size: 52px; text-align: center;">Registrieren</h1>
@@ -114,15 +125,17 @@
         <?php
             $file = file_get_contents('database_config.json');
             $data = json_decode($file, True);
-            $pdo = new PDO("mysql:host=". $data["host"]. ";dbname=" . $data["database"], $data["user"] , $data["password"]);    //connecting to the database
-            if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["register-email"])) {     //checking if form has been submitted
+            // Database connection 
+            $pdo = new PDO("mysql:host=". $data["host"]. ";dbname=" . $data["database"], $data["user"] , $data["password"]);  
+            // checking if form has been submitted and set input as variables 
+            if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["register-email"])) {     
                 $errors = [];
 
                 $username = htmlspecialchars(stripslashes(trim($_POST["register-username"])));
                 $email = htmlspecialchars(stripslashes(trim($_POST["register-email"])));
                 $password = htmlspecialchars(stripslashes(trim($_POST["register-password"])));
                 $password_check = htmlspecialchars(stripslashes(trim($_POST["register-password-check"])));
-
+                // search for input errors
                 if (empty($username)) {
                     $errors[] = "Ein Benutzername ist erforderlich";
                 }
@@ -147,7 +160,7 @@
                 if ($password != $password_check) {
                     $errors[] = "Die beiden Passwörter stimen nicht überein";
                 }
-
+                // hashing password and insert user to table 'users' if no input errors are found
                 if (sizeof($errors) == 0) {
                     $con = new mysqli($data["host"], $data["user"], $data["password"], $data["database"]);
 
@@ -174,6 +187,7 @@
     <div id="blackscreen-edit-account" onclick="quit_blackscreen_edit_account()"></div>
     <div id="hoverbox-bg-edit-account">
         <div id='hoverbox-edit-account'>
+            <!-- account editing form -->
             <form id="edit-account-form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                 <input id="edit-account" name="edit-username" placeholder="Neuer Name">
             </form>
@@ -181,8 +195,10 @@
         <?php
             $file = file_get_contents('database_config.json');
             $data = json_decode($file, True);
-            $con = new mysqli($data["host"], $data["user"], $data["password"], $data["database"]); //connecting to database
-            if ($con -> connect_error) { die("Ein Fehler ist aufgetreten"); }   //checking if connection was succesful
+            // connect to database
+            $con = new mysqli($data["host"], $data["user"], $data["password"], $data["database"]); 
+            if ($con -> connect_error) { die("Ein Fehler ist aufgetreten"); }   
+            // changing username in table 'users'
             if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["edit-username"])) {
                 if (strlen($_POST["edit-username"]) == 0 || strlen($_POST["edit-username"]) > 255) {
                     echo "<script>setTimeout(function() { alert('Der Nutzername muss zwischen 1 und 255 Zeichen lang sein!'); }, 100);</script>";
@@ -190,8 +206,10 @@
                     $res = $con -> query("UPDATE users SET username = '" . $_POST["edit-username"] . "' WHERE ID = " . $_SESSION["user_id"] . ";");
                     $res = $con -> query("SELECT * FROM users WHERE ID = " . $_SESSION["user_id"] . ";");
                     $user_data = $res -> fetch_assoc();
-                    $_SESSION["username"] = $user_data["username"];     //refreshing username in session
+                    //refreshing username in session
+                    $_SESSION["username"] = $user_data["username"];     
                 }
+            // changing email in table 'users'
             } else if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["edit-email"])) {
                 if (strlen($_POST["edit-email"]) == 0 || strlen($_POST["edit-email"]) > 255 || !filter_var($_POST["edit-email"], FILTER_VALIDATE_EMAIL)) {
                     echo "<script>setTimeout(function() { alert('Die Email muss zwischen 1 und 255 Zeichen lang sein und eine gültige Mailadresse sein!'); }, 100);</script>";
@@ -199,8 +217,10 @@
                     $res = $con -> query("UPDATE users SET email = '" . $_POST["edit-email"] . "' WHERE ID = " . $_SESSION["user_id"] . ";");
                     $res = $con -> query("SELECT * FROM users WHERE ID = " . $_SESSION["user_id"] . ";");
                     $user_data = $res -> fetch_assoc();
-                    $_SESSION["email"] = $user_data["email"];   //refreshing email in session
+                    //refreshing email in session
+                    $_SESSION["email"] = $user_data["email"];   
                 }
+            // changing password in table 'users'
             } else if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["edit-password"])) {
                 if (strlen($_POST["edit-password"]) < 8 || strlen($_POST["edit-password"]) > 255) {
                     echo "<script>setTimeout(function() { alert('Die Passwort muss zwischen 8 und 255 Zeichen lang sein!'); }, 100);</script>";
@@ -210,6 +230,7 @@
             }
         ?>
     </div>
+    <!-- Userinterface -->
     <div id="navbar">
         <span class="material-icons" onclick="window.location.replace('./')">home</span>
         <span class="material-icons" onclick="new_question()"><?php if ($_SESSION['user_id'] != -1) { echo "edit_note"; } else { echo "person_add"; } ?></span>
@@ -682,7 +703,7 @@
     }
 
     #description {
-        postion: fixed;
+        position: fixed;
         outline: none;
         resize: none;
         border: 2px solid #707070;
@@ -875,6 +896,7 @@
     }
 </style>
 <script>
+    // functions to open the ui's for account management, compose questions etc.
     function new_question() {
         if (document.getElementById('login-check').innerHTML == "logged_in") {
             document.getElementById('blackscreen-question').id='blackscreen-anim-1-question';

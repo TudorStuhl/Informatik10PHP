@@ -12,21 +12,22 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="0; url=./index2.php">
+    <meta http-equiv="refresh" content="0; url=./index.php">
     <title>Forum</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="./stylesheets/index2.css">
+    <link rel="stylesheet" href="./stylesheets/index.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 <body>
     <?php
-
+    // unsetting session to log-out user
     session_unset();
-
+    // setting users as guest
     $_SESSION['user_id'] = -1;
     $_SESSION['username'] = "Gast";
     $_SESSION['email'] = "Du bist nicht angemeldet";
     ?>
+    <!-- Userinterface -->
     <div id="navbar">
         <span class="material-icons">home</span>
         <span class="material-icons" onclick="new_question()">edit_note</span>

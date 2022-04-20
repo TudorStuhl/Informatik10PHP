@@ -22,7 +22,11 @@
         if ($res->num_rows > 0) {
             while ($i = $res->fetch_assoc()) {
                 $user_id = $i["user_id"];
+                $question_id = $i['ID'];
                 $username = "USERNAME_MISSING";
+                $conn = new mysqli($data['host'], $data['user'], $data['password'], $data['database']);
+                $ras = $conn -> query("SELECT * FROM replies WHERE entry_id = $question_id");
+                $count = $ras -> num_rows;
                 $result = $con->query("SELECT * FROM users WHERE ID = $user_id;");
                 $user_data = $result->fetch_assoc();
                 if ($user_data != NULL) {
@@ -41,11 +45,12 @@
                 $color = $colors[array_rand($colors)];
                 $key = array_search($color, $colors);
                 unset($colors[$key]);
+                
                 echo "<a href='question.php?id=$question_id'>
                 <div class='question $color'>
                 <div>
                     <span class='name' style='text-align: center;'>$username</span><br>
-                    <span class='answers'>10<br>Antworten</span>
+                    <span class='answers'>$count<br>Antworten</span>
                 </div>
                 <h2>$topic</h2>
                 <p>
