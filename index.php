@@ -720,6 +720,7 @@
         position: fixed;
         border: none;
         margin-top: 380px;
+        margin-left: 1280px;
         font-size: 66px;
         color: rgba(64, 64, 64, 0.26);
         background-color: transparent;

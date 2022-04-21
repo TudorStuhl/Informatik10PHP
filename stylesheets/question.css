@@ -125,6 +125,9 @@ content {
 
 .topic {
     position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     color: #FDFBED;
     width: 1373px;
     height: 68px;
@@ -147,10 +150,6 @@ content {
 }
 
 .name {
-    position: absolute;
-    margin-top: 10px;
-    margin-left: 50%;
-    transform: translateX(-50%);
     font-size: 30px;
 }
 
