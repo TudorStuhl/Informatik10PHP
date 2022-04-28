@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.1.1
+-- version 5.0.2
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Erstellungszeit: 21. Apr 2022 um 11:09
--- Server-Version: 10.4.22-MariaDB
--- PHP-Version: 7.4.27
+-- Erstellungszeit: 28. Apr 2022 um 11:40
+-- Server-Version: 10.4.14-MariaDB
+-- PHP-Version: 7.2.33
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Datenbank: `forum`
 --
+CREATE DATABASE IF NOT EXISTS `forum` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `forum`;
 
 -- --------------------------------------------------------
 
