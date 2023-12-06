@@ -11,7 +11,7 @@ Important: access to .json files need to be turned of on the webserver otherwise
 The project contains:
 
 1. index.php: main page with most of the functions
-2. logout.php: used to logout from index.php, has no over use
+2. logout.php: used to logout from index.php, has no other use
 3. question.php: page were questions are shown in a larger amount
 4. question_logout.php: review logout.php – for the question.php
 5. index.css: stylesheet for the index.php
